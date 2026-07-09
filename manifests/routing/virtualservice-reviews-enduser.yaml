@@ -1,0 +1,37 @@
+# Escopo 2/3 — roteamento interno (mesh) do reviews por header 'end-user'.
+# Sem 'gateways:', então aplica-se ao tráfego DENTRO do mesh (a chamada que
+# o productpage faz para reviews), não ao tráfego externo do Gateway.
+#
+# IMPORTANTE (ver docs/arquitetura.md secao 12): o productpage só popula o
+# header 'end-user' a partir de sessão logada (POST /login com username=X),
+# não a partir de um header 'end-user' enviado diretamente pelo cliente.
+# Testar via login simulado (ver scripts/05-apply-enduser-routing.sh).
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: reviews-end-user
+  namespace: bookinfo
+spec:
+  hosts:
+  - reviews
+  http:
+  - match:
+    - headers:
+        end-user:
+          exact: Ted
+    route:
+    - destination:
+        host: reviews
+        subset: v3
+  - match:
+    - headers:
+        end-user:
+          exact: Bill
+    route:
+    - destination:
+        host: reviews
+        subset: v2
+  - route:
+    - destination:
+        host: reviews
+        subset: v1

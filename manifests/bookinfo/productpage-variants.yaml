@@ -14,14 +14,14 @@ kind: Service
 metadata:
   name: productpage-simpleproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: simpleproduct
 spec:
   ports:
   - port: 9080
     name: http
   selector:
-    app: productpage
+    app: productpage-variant
     variant: simpleproduct
 ---
 apiVersion: apps/v1
@@ -29,19 +29,19 @@ kind: Deployment
 metadata:
   name: productpage-simpleproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: simpleproduct
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: productpage
+      app: productpage-variant
       variant: simpleproduct
   template:
     metadata:
       labels:
-        app: productpage
+        app: productpage-variant
         variant: simpleproduct
         version: v1
     spec:
@@ -72,14 +72,14 @@ kind: Service
 metadata:
   name: productpage-backproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: backproduct
 spec:
   ports:
   - port: 9080
     name: http
   selector:
-    app: productpage
+    app: productpage-variant
     variant: backproduct
 ---
 apiVersion: apps/v1
@@ -87,19 +87,19 @@ kind: Deployment
 metadata:
   name: productpage-backproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: backproduct
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: productpage
+      app: productpage-variant
       variant: backproduct
   template:
     metadata:
       labels:
-        app: productpage
+        app: productpage-variant
         variant: backproduct
         version: v1
     spec:
@@ -130,14 +130,14 @@ kind: Service
 metadata:
   name: productpage-colorproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: colorproduct
 spec:
   ports:
   - port: 9080
     name: http
   selector:
-    app: productpage
+    app: productpage-variant
     variant: colorproduct
 ---
 apiVersion: apps/v1
@@ -145,19 +145,19 @@ kind: Deployment
 metadata:
   name: productpage-colorproduct
   labels:
-    app: productpage
+    app: productpage-variant
     variant: colorproduct
     version: v1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: productpage
+      app: productpage-variant
       variant: colorproduct
   template:
     metadata:
       labels:
-        app: productpage
+        app: productpage-variant
         variant: colorproduct
         version: v1
     spec:
