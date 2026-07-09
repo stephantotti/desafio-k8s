@@ -1,0 +1,50 @@
+# Services adicionais que isolam cada versão do reviews individualmente.
+# Diferente do Service "reviews" original (que seleciona as 3 versões e
+# depende do DestinationRule/subset para load balancing), estes aqui
+# selecionam DIRETAMENTE uma única versão via label selector — usados pelos
+# productpage-{simpleproduct,backproduct,colorproduct} via REVIEWS_HOSTNAME
+# (ver docs/arquitetura.md, seção "Escopo 1/3").
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-v1-only
+  labels:
+    app: reviews
+    variant: simpleproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: reviews
+    version: v1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-v2-only
+  labels:
+    app: reviews
+    variant: backproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: reviews
+    version: v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-v3-only
+  labels:
+    app: reviews
+    variant: colorproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: reviews
+    version: v3

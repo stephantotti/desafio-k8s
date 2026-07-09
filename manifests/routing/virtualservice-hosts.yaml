@@ -1,0 +1,55 @@
+##################################################################################################
+# Escopo 1/3 — cada host externo é roteado para o productpage dedicado
+# correspondente (que por sua vez já está configurado, via REVIEWS_HOSTNAME,
+# para falar só com a versão de reviews certa). Ver docs/arquitetura.md.
+##################################################################################################
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: productpage-simpleproduct
+  namespace: bookinfo
+spec:
+  hosts:
+  - "simpleproduct.local"
+  gateways:
+  - bookinfo-gateway
+  http:
+  - route:
+    - destination:
+        host: productpage-simpleproduct
+        port:
+          number: 9080
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: productpage-backproduct
+  namespace: bookinfo
+spec:
+  hosts:
+  - "backproduct.local"
+  gateways:
+  - bookinfo-gateway
+  http:
+  - route:
+    - destination:
+        host: productpage-backproduct
+        port:
+          number: 9080
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: productpage-colorproduct
+  namespace: bookinfo
+spec:
+  hosts:
+  - "colorproduct.local"
+  gateways:
+  - bookinfo-gateway
+  http:
+  - route:
+    - destination:
+        host: productpage-colorproduct
+        port:
+          number: 9080

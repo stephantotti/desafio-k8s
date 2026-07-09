@@ -1,0 +1,181 @@
+# 3 variantes do productpage-v1, MESMA imagem oficial do Istio, cada uma
+# configurada via a env var oficial REVIEWS_HOSTNAME (suportada nativamente
+# por productpage.py) para falar com um Service de reviews dedicado a uma
+# única versão. Isso resolve o Escopo 1/3 sem modificar a imagem/app: o
+# productpage original só repassa um conjunto fixo de headers para o
+# reviews (não inclui o Host da requisição), então a diferenciação por
+# host precisa acontecer na config de qual service cada cópia chama, não
+# em roteamento de header. Ver docs/arquitetura.md.
+##################################################################################################
+# simpleproduct -> reviews-v1-only (reviews-v1, sem estrelas)
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage-simpleproduct
+  labels:
+    app: productpage
+    variant: simpleproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: productpage
+    variant: simpleproduct
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-simpleproduct
+  labels:
+    app: productpage
+    variant: simpleproduct
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+      variant: simpleproduct
+  template:
+    metadata:
+      labels:
+        app: productpage
+        variant: simpleproduct
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+      - name: productpage
+        image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REVIEWS_HOSTNAME
+          value: "reviews-v1-only"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        securityContext:
+          runAsUser: 1000
+      volumes:
+      - name: tmp
+        emptyDir: {}
+---
+##################################################################################################
+# backproduct -> reviews-v2-only (reviews-v2, estrelas pretas)
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage-backproduct
+  labels:
+    app: productpage
+    variant: backproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: productpage
+    variant: backproduct
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-backproduct
+  labels:
+    app: productpage
+    variant: backproduct
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+      variant: backproduct
+  template:
+    metadata:
+      labels:
+        app: productpage
+        variant: backproduct
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+      - name: productpage
+        image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REVIEWS_HOSTNAME
+          value: "reviews-v2-only"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        securityContext:
+          runAsUser: 1000
+      volumes:
+      - name: tmp
+        emptyDir: {}
+---
+##################################################################################################
+# colorproduct -> reviews-v3-only (reviews-v3, estrelas vermelhas)
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage-colorproduct
+  labels:
+    app: productpage
+    variant: colorproduct
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: productpage
+    variant: colorproduct
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-colorproduct
+  labels:
+    app: productpage
+    variant: colorproduct
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+      variant: colorproduct
+  template:
+    metadata:
+      labels:
+        app: productpage
+        variant: colorproduct
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+      - name: productpage
+        image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REVIEWS_HOSTNAME
+          value: "reviews-v3-only"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        securityContext:
+          runAsUser: 1000
+      volumes:
+      - name: tmp
+        emptyDir: {}
