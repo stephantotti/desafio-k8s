@@ -59,7 +59,7 @@ data:
       name: Loki
       orgId: 1
       type: loki
-      url: http://loki:3100
+      url: http://loki.logging:3100
   dashboardproviders.yaml: |
     apiVersion: 1
     providers:
