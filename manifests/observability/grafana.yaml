@@ -77,6 +77,13 @@ data:
         path: /var/lib/grafana/dashboards/istio-services
       orgId: 1
       type: file
+    - disableDeletion: false
+      folder: istio
+      name: bookinfo-custom
+      options:
+        path: /var/lib/grafana/dashboards/bookinfo-custom
+      orgId: 1
+      type: file
 ---
 # Source: grafana/templates/service.yaml
 apiVersion: v1
@@ -159,6 +166,8 @@ spec:
               mountPath: "/var/lib/grafana/dashboards/istio"
             - name: dashboards-istio-services
               mountPath: "/var/lib/grafana/dashboards/istio-services"
+            - name: dashboards-bookinfo-custom
+              mountPath: "/var/lib/grafana/dashboards/bookinfo-custom"
             - name: config
               mountPath: "/etc/grafana/provisioning/datasources/datasources.yaml"
               subPath: "datasources.yaml"
@@ -222,6 +231,9 @@ spec:
         - name: dashboards-istio-services
           configMap:
             name: istio-services-grafana-dashboards
+        - name: dashboards-bookinfo-custom
+          configMap:
+            name: bookinfo-custom-dashboards
         - name: storage
           emptyDir: {}
 
