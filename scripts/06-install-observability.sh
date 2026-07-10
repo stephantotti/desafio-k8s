@@ -56,5 +56,13 @@ log "Concluído. Pods em monitoring:"
 kubectl get pods -n monitoring
 
 echo
-echo "Para acessar os dashboards, rode:"
-echo "  scripts/access-dashboards.sh"
+log "Abrindo os dashboards automaticamente..."
+if ! "${SCRIPT_DIR}/access-dashboards.sh"; then
+  echo
+  echo "AVISO: a stack de observabilidade subiu OK, mas algum túnel de acesso"
+  echo "falhou (pode ser hiccup momentâneo de rede). Rode manualmente depois:"
+  echo "  scripts/access-dashboards.sh"
+fi
+echo
+echo "Próximo passo: gerar tráfego nos 3 hosts + end-user para popular os"
+echo "dashboards, e importar/conferir os painéis de Ingress Gateway e por Service."
