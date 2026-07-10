@@ -55,7 +55,7 @@ log "Validando injeção de sidecar (esperado: 2/2 em cada pod)..."
 ATTEMPTS=0
 MAX_ATTEMPTS=6
 while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
-  NOT_INJECTED="$(kubectl get pods -n "$NAMESPACE" -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.containers[*].name}{"\n"}{end}' | grep -v 'istio-proxy' || true)"
+  NOT_INJECTED="$(kubectl get pods -n "$NAMESPACE" -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.containers[*].name}{" "}{.spec.initContainers[*].name}{"\n"}{end}' | grep -v 'istio-proxy' || true)"
   if [ -z "$NOT_INJECTED" ]; then
     break
   fi
@@ -75,3 +75,5 @@ kubectl get destinationrules -n "$NAMESPACE"
 echo
 echo "Teste rápido (ainda sem Gateway/VirtualService — deve dar 404, não timeout):"
 echo "    curl -sI http://localhost/"
+echo
+echo "Próximo passo: aplicar o Gateway + VirtualServices (Escopo 1/3 e 2/3)."
