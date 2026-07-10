@@ -19,9 +19,12 @@ command -v kubectl >/dev/null 2>&1 || fail "kubectl não encontrado."
 CURRENT_CONTEXT="$(kubectl config current-context 2>/dev/null || true)"
 [ "$CURRENT_CONTEXT" = "$EXPECTED_CONTEXT" ] || fail "Contexto atual é '${CURRENT_CONTEXT}', esperado '${EXPECTED_CONTEXT}'."
 
-for f in prometheus.yaml grafana.yaml kiali.yaml; do
+for f in prometheus.yaml grafana.yaml kiali.yaml custom-dashboard-configmap.yaml; do
   [ -f "${OBS_DIR}/${f}" ] || fail "Não encontrei ${OBS_DIR}/${f}"
 done
+
+log "Aplicando ConfigMap do dashboard customizado (antes do Grafana, que já monta essa pasta)..."
+kubectl apply -f "${OBS_DIR}/custom-dashboard-configmap.yaml"
 
 log "Aplicando Prometheus..."
 kubectl apply -f "${OBS_DIR}/prometheus.yaml"
@@ -32,21 +35,26 @@ kubectl apply -f "${OBS_DIR}/grafana.yaml"
 log "Aplicando Kiali..."
 kubectl apply -f "${OBS_DIR}/kiali.yaml"
 
-log "Aguardando os deployments ficarem prontos..."
+log "Aguardando os deployments ficarem prontos (1a rodada)..."
 kubectl -n monitoring rollout status deployment/prometheus --timeout=180s
 kubectl -n monitoring rollout status deployment/grafana --timeout=180s
 kubectl -n monitoring rollout status deployment/kiali --timeout=180s
+
+# ---------------------------------------------------------------------------
+# Restart explícito do Grafana SEMPRE: o Kubernetes não reinicia pods
+# automaticamente quando só o CONTEÚDO de um ConfigMap muda (só quando a
+# spec do Deployment muda) — como o dashboard customizado é montado via
+# ConfigMap, um "kubectl apply" sozinho pode não bastar para o Grafana
+# enxergar dashboards atualizados. Reiniciar sempre é barato e idempotente,
+# evita depender de lembrar disso manualmente (ver docs/arquitetura.md).
+# ---------------------------------------------------------------------------
+log "Reiniciando Grafana para garantir que o dashboard customizado seja carregado..."
+kubectl -n monitoring rollout restart deployment/grafana
+kubectl -n monitoring rollout status deployment/grafana --timeout=120s
 
 log "Concluído. Pods em monitoring:"
 kubectl get pods -n monitoring
 
 echo
-echo "Para acessar os dashboards (rode cada um em um terminal separado):"
-echo "  kubectl port-forward -n monitoring svc/grafana 3000:3000"
-echo "  kubectl port-forward -n monitoring svc/kiali 20001:20001"
-echo "  kubectl port-forward -n monitoring svc/prometheus 9090:9090"
-echo
-echo "Depois, no navegador:"
-echo "  Grafana:    http://localhost:3000"
-echo "  Kiali:      http://localhost:20001"
-echo "  Prometheus: http://localhost:9090"
+echo "Para acessar os dashboards, rode:"
+echo "  scripts/access-dashboards.sh"
