@@ -13,7 +13,7 @@ SHELL := /usr/bin/env bash
 SCRIPTS := scripts
 
 .PHONY: bootstrap up install-tools cluster istio bookinfo routing enduser \
-        observability ratelimit logging traffic dashboards kubectl-env \
+        observability ratelimit logging mtls traffic dashboards kubectl-env \
         resume destroy down help
 
 help:
@@ -29,6 +29,7 @@ help:
 	@echo "  make observability   - instala Prometheus/Grafana/Kiali + dashboards"
 	@echo "  make ratelimit       - aplica o rate limiting por serviço (Escopo 3/3)"
 	@echo "  make logging         - instala Loki/Promtail"
+	@echo "  make mtls            - aplica mTLS STRICT + regressao dos 3 escopos"
 	@echo "  make traffic         - gera tráfego de teste (60s, popula os dashboards)"
 	@echo "  make dashboards      - reabre os túneis de acesso aos dashboards"
 	@echo "  make kubectl-env     - configura alias/env var do kubectl (k + KUBECONFIG)"
@@ -36,7 +37,7 @@ help:
 
 up: bootstrap
 
-bootstrap: install-tools cluster istio bookinfo routing enduser observability ratelimit logging kubectl-env
+bootstrap: install-tools cluster istio bookinfo routing enduser observability ratelimit logging mtls kubectl-env
 	@echo ""
 	@echo ">>> Ambiente completo. Rode 'make traffic' para gerar tráfego de teste,"
 	@echo ">>> ou acesse os dashboards diretamente (túneis já abertos por 'observability')."
@@ -70,6 +71,9 @@ ratelimit:
 
 logging:
 	$(SCRIPTS)/09-install-logging.sh
+
+mtls:
+	$(SCRIPTS)/10-apply-mtls.sh
 
 dashboards:
 	$(SCRIPTS)/access-dashboards.sh

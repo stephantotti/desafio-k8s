@@ -39,7 +39,8 @@ Isso executa, em sequência, todos os scripts numerados em `scripts/`:
 | 7 | `06-install-observability.sh` | Instala Prometheus/Grafana/Kiali + dashboard customizado |
 | 8 | `08-apply-ratelimit.sh` | Aplica o rate limiting por serviço (Escopo 3/3) |
 | 9 | `09-install-logging.sh` | Instala Loki/Promtail |
-| 10 | `configure-kubectl-env.sh` | Configura alias `k` e `KUBECONFIG` dedicado |
+| 10 | `10-apply-mtls.sh` | Aplica mTLS STRICT + regressão dos 3 escopos |
+| 11 | `configure-kubectl-env.sh` | Configura alias `k` e `KUBECONFIG` dedicado |
 
 Leva alguns minutos na primeira vez (baixando imagens Docker). Rodar de
 novo depois é rápido — todos os scripts são idempotentes, então `make up`
@@ -63,6 +64,7 @@ make enduser
 make observability
 make ratelimit
 make logging
+make mtls
 make kubectl-env
 ```
 

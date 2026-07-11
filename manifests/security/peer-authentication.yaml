@@ -1,0 +1,13 @@
+# Força mTLS STRICT entre todos os serviços do namespace bookinfo — só
+# aceita tráfego criptografado/autenticado via sidecar Envoy, rejeitando
+# conexões em texto puro (plaintext) que tentem pular o mesh. Ver
+# docs/seguranca.md para o contexto e o porquê disso ser uma pendência
+# resolvida antes da apresentação.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: bookinfo
+spec:
+  mtls:
+    mode: STRICT
